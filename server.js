@@ -21,23 +21,26 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 io.on("connection", (socket) => {
-  socket.on("sendMessage", (msg) => {
+  socket.on("sendMessage", (msg, callback) => {
     let chat = new Chat({
       message: msg.message,
       sender: msg.sender,
       receiver: msg.receiver,
     });
-    chat.save((err, doc) => {
-      if (err) return res.json({ success: false, err });
-      io.to(msg.reciever).emit("message", msg);
-    });
+    // Remove the comments to save in db
+
+    // chat.save((err, doc) => {
+    // if (err) return res.json({ success: false, err });
+    io.to(msg.reciever).emit("message", msg);
+    callback();
+    // });
   });
 });
 
+app.use(cors());
+
 app.use("/api/users", User);
 app.use("/api/company", Company);
-
-app.use(cors());
 
 const PORT = process.env.PORT || 8000;
 
